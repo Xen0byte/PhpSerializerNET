@@ -52,6 +52,13 @@ public class EnumDeserializationTest {
 			IntEnumWithPropertyName.C,
 			PhpSerialization.Deserialize<IntEnumWithPropertyName>("s:1:\"C\";")
 		);
+		var ex = Assert.Throws<DeserializationException>(
+			() => PhpSerialization.Deserialize<IntEnumWithPropertyName>("s:1:\"Z\";")
+		);
+		Assert.Equal(
+			"Exception encountered while trying to assign 'Z' to type 'IntEnumWithPropertyName'. The value could not be matched to an enum member.",
+			ex.Message
+		);
 	}
 
 	[Fact]

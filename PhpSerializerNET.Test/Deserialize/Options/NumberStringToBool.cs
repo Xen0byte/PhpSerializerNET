@@ -14,6 +14,7 @@ namespace PhpSerializerNET.Test.Deserialize.Options {
 
 			Assert.Equal(true, PhpSerialization.Deserialize("s:1:\"1\";", options));
 			Assert.Equal(false, PhpSerialization.Deserialize("s:1:\"0\";", options));
+			Assert.Equal("2", PhpSerialization.Deserialize("s:1:\"2\";", options));
 		}
 
 		[Fact]

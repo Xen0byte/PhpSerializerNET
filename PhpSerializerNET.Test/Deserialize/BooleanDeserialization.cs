@@ -42,6 +42,15 @@ public class DeserializeBooleansTest {
 	}
 
 	[Fact]
+	public void DeserializesToNullableLong() {
+		var result = PhpSerialization.Deserialize<long?>("b:0;");
+		Assert.Equal(0, result);
+
+		result = PhpSerialization.Deserialize<long?>("b:1;");
+		Assert.Equal(1, result);
+	}
+
+	[Fact]
 	public void DeserializesToString() {
 		var result = PhpSerialization.Deserialize<string>("b:0;");
 
