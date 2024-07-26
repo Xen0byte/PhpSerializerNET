@@ -4,6 +4,8 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 **/
 
+using System;
+using System.Text;
 using Xunit;
 
 namespace PhpSerializerNET.Test.Deserialize.Options {
@@ -23,6 +25,25 @@ namespace PhpSerializerNET.Test.Deserialize.Options {
 
 			Assert.True(PhpSerialization.Deserialize<bool>("s:1:\"1\";", options));
 			Assert.False(PhpSerialization.Deserialize<bool>("s:1:\"0\";", options));
+		}
+
+		[Fact]
+		public void InvalidEncodingThrows() {
+			var invalidOptions = new PhpDeserializationOptions() { InputEncoding = Encoding.Default };
+			var exception = Assert.Throws<ArgumentException>(
+				() => PhpSerialization.DeserializeUtf8<string>( "s:1:\"0\";"u8, invalidOptions)
+			);
+			Assert.Equal("Can not use input encoding other than UTF8 (Parameter 'options')", exception.Message);
+
+			exception = Assert.Throws<ArgumentException>(
+				() => PhpSerialization.DeserializeUtf8( "s:1:\"0\";"u8, typeof(string), invalidOptions)
+			);
+			Assert.Equal("Can not use input encoding other than UTF8 (Parameter 'options')", exception.Message);
+
+			exception = Assert.Throws<ArgumentException>(
+				() => PhpSerialization.DeserializeUtf8( "s:1:\"0\";"u8, invalidOptions)
+			);
+			Assert.Equal("Can not use input encoding other than UTF8 (Parameter 'options')", exception.Message);
 		}
 
 		[Fact]

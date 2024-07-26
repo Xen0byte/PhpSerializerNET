@@ -6,6 +6,7 @@
 
 using Xunit;
 using PhpSerializerNET.Test.DataTypes;
+using System.Diagnostics;
 
 namespace PhpSerializerNET.Test.Deserialize.Options;
 
@@ -23,6 +24,47 @@ public class EnableTypeLookupTest {
 		var mappedClass = result as MappedClass;
 		Assert.Equal("Hello World!", mappedClass.English);
 		Assert.Equal("Hallo Welt!", mappedClass.German);
+	}
+
+	[Fact]
+	public void CachingWorks() {
+		PhpSerialization.ClearTypeCache();
+		PhpSerialization.ClearPropertyInfoCache();
+		var options = new PhpDeserializationOptions() {
+			EnableTypeLookup = true,
+			TypeCache = TypeCacheFlag.ClassNames | TypeCacheFlag.PropertyInfo
+		};
+		var stopWatch = new Stopwatch();
+		stopWatch.Start();
+		var result = PhpSerialization.Deserialize(
+			"O:11:\"MappedClass\":2:{s:2:\"en\";s:12:\"Hello World!\";s:2:\"de\";s:11:\"Hallo Welt!\";}",
+			options
+		);
+		stopWatch.Stop();
+		long uncachedTime = stopWatch.ElapsedTicks;
+
+		stopWatch.Reset();
+		stopWatch.Start();
+		result = PhpSerialization.Deserialize(
+			"O:11:\"MappedClass\":2:{s:2:\"en\";s:12:\"Hello World!\";s:2:\"de\";s:11:\"Hallo Welt!\";}",
+			options
+		);
+		stopWatch.Stop();
+		long cachedTime = stopWatch.ElapsedTicks;
+
+		Assert.True(uncachedTime / cachedTime  > 100);
+
+		PhpSerialization.ClearTypeCache();
+		PhpSerialization.ClearPropertyInfoCache();
+		stopWatch.Reset();
+		stopWatch.Start();
+		result = PhpSerialization.Deserialize(
+			"O:11:\"MappedClass\":2:{s:2:\"en\";s:12:\"Hello World!\";s:2:\"de\";s:11:\"Hallo Welt!\";}",
+			options
+		);
+		stopWatch.Stop();
+		long secondUncachedTime = stopWatch.ElapsedTicks;
+		Assert.True(secondUncachedTime / cachedTime  > 100);
 	}
 
 	[Fact]

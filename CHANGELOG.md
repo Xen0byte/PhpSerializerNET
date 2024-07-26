@@ -4,6 +4,10 @@
 - `PhpTokenizer` class is now internal.
 - Removed support for `net6.0` and `net7.0`.
 
+## Features
+- Added `PhpSerialization.DeserializeUtf8(ReadOnlySpan<byte>)` overloads for cases in which consumers directly work with
+  UTF8 inputs and can skip the re-encoding.
+
 ## Regular changes
 - Integers and doubles without a value now give a better error message (`i:;` and `d:;`).
 
