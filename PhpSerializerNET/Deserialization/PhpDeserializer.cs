@@ -66,12 +66,7 @@ internal ref struct PhpDeserializer {
 		}
 	}
 
-
-
 	private object DeserializeToken(Type targetType) {
-		if (targetType == null) {
-			throw new ArgumentNullException(nameof(targetType));
-		}
 		var token = this._tokens[this._currentToken];
 		this._currentToken++;
 		switch (token.Type) {
@@ -183,11 +178,7 @@ internal ref struct PhpDeserializer {
 			if (value == "" && _options.EmptyStringToDefault) {
 				return null;
 			}
-
 			targetType = targetType.GenericTypeArguments[0];
-			if (targetType == null) {
-				throw new NullReferenceException("Could not get underlying type for nullable reference type " + targetType);
-			}
 		}
 
 		// Short-circuit strings:
@@ -225,7 +216,7 @@ internal ref struct PhpDeserializer {
 
 			if (targetType == typeof(bool)) {
 				if (_options.NumberStringToBool && value is "0" or "1") {
-					return value.PhpToBool();
+					return value == "1";
 				}
 			}
 
