@@ -16,6 +16,7 @@
 - Reduced memory allocations both in the input re-encoding and the deserialization.
 - Delay the materialization of strings when deserializing. This can avoid string allocations entirely for integers,
   doubles and floats. 
+- Improved serialization performance for strings, integers, `IList<T>`, `ExpandoObject`, Dictionaries and `PhpDynamicObject`
 
 ## Internal
 Split the deserialization into 3 phases:

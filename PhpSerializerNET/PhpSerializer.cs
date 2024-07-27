@@ -21,50 +21,49 @@ internal class PhpSerializer {
 
 	public PhpSerializer(PhpSerializiationOptions options = null) {
 		this._options = options ?? PhpSerializiationOptions.DefaultOptions;
-
 		this._seenObjects = new();
 	}
 
 	public string Serialize(object input) {
 		switch (input) {
-			case Enum enumValue: {
-					if (this._options.NumericEnums) {
-						return $"i:{enumValue.GetNumericString()};";
-					} else {
-						return this.Serialize(enumValue.ToString());
-					}
+			case Enum enumValue:
+				if (this._options.NumericEnums) {
+					return $"i:{enumValue.GetNumericString()};";
+				} else {
+					return this.Serialize(enumValue.ToString());
 				}
-			case long longValue: {
-					return $"i:{longValue};";
+
+			case long longValue:
+				return string.Concat("i:", longValue.ToString(CultureInfo.InvariantCulture), ";");
+
+			case int integerValue:
+				return string.Concat("i:", integerValue.ToString(CultureInfo.InvariantCulture), ";");
+
+			case double floatValue:
+				if (double.IsPositiveInfinity(floatValue)) {
+					return $"d:INF;";
 				}
-			case int integerValue: {
-					return $"i:{integerValue};";
+				if (double.IsNegativeInfinity(floatValue)) {
+					return $"d:-INF;";
 				}
-			case double floatValue: {
-					if (double.IsPositiveInfinity(floatValue)) {
-						return $"d:INF;";
-					}
-					if (double.IsNegativeInfinity(floatValue)) {
-						return $"d:-INF;";
-					}
-					if (double.IsNaN(floatValue)) {
-						return $"d:NAN;";
-					}
-					return $"d:{floatValue.ToString(CultureInfo.InvariantCulture)};";
+				if (double.IsNaN(floatValue)) {
+					return $"d:NAN;";
 				}
-			case string stringValue: {
-					// Use the UTF8 byte count, because that's what the PHP implementation does:
-					return $"s:{ASCIIEncoding.UTF8.GetByteCount(stringValue)}:\"{stringValue}\";";
-				}
-			case bool boolValue: {
-					return boolValue ? "b:1;" : "b:0;";
-				}
-			case null: {
-					return "N;";
-				}
-			default: {
-					return this.SerializeComplex(input);
-				}
+				return string.Concat("d:", floatValue.ToString(CultureInfo.InvariantCulture), ";");
+
+			case string stringValue:
+				// Use the UTF8 byte count, because that's what the PHP implementation does:
+				string length = Encoding.UTF8.GetByteCount(stringValue).ToString(CultureInfo.InvariantCulture);
+				return string.Concat("s:", length, ":\"", stringValue, "\";");
+
+			case bool boolValue:
+				return boolValue ? "b:1;" : "b:0;";
+
+			case null:
+				return "N;";
+
+			default:
+				return this.SerializeComplex(input);
 		}
 	}
 
@@ -77,59 +76,42 @@ internal class PhpSerializer {
 		}
 		this._seenObjects.Add(input);
 
-		StringBuilder output = new StringBuilder();
 		switch (input) {
 			case PhpDynamicObject dynamicObject: {
-					var inputType = input.GetType();
 					var className = dynamicObject.GetClassName() ?? "stdClass";
-					IEnumerable<string> memberNames = dynamicObject.GetDynamicMemberNames();
-
-					output.Append("O:")
-						.Append(className.Length)
-						.Append(":\"")
-						.Append(className)
-						.Append("\":")
-						.Append(memberNames.Count())
-						.Append(":{");
-
-					foreach (string memberName in memberNames) {
-						output.Append(this.Serialize(memberName))
-							.Append(this.Serialize(dynamicObject.GetMember(memberName)));
+					ICollection<string> memberNames = dynamicObject.GetDynamicMemberNames();
+					string preamble = $"O:{className.Length}:\"{className}\":{memberNames.Count}:{{";
+					string[] entryStrings = new string[memberNames.Count * 2];
+					int entryIndex = 0;
+					foreach (var memberName in memberNames) {
+						entryStrings[entryIndex] = this.Serialize(memberName);
+						entryStrings[entryIndex + 1] = this.Serialize(dynamicObject.GetMember(memberName));
+						entryIndex += 2;
 					}
-					output.Append('}');
-					return output.ToString();
+					return string.Concat(preamble, string.Concat(entryStrings), "}");
 				}
 			case ExpandoObject expando: {
 					var dictionary = (IDictionary<string, object>)expando;
-					var inputType = input.GetType();
-					output.Append("O:")
-						.Append("stdClass".Length)
-						.Append(":\"")
-						.Append("stdClass")
-						.Append("\":")
-						.Append(dictionary.Keys.Count)
-						.Append(":{");
+					string preamble = $"O:8:\"stdClass\":{dictionary.Keys.Count}:{{";
 
-					foreach (var keyValue in dictionary) {
-						output.Append(this.Serialize(keyValue.Key))
-							.Append(this.Serialize(keyValue.Value));
+					string[] entryStrings = new string[dictionary.Count * 2];
+					int entryIndex = 0;
+					foreach (var entry in dictionary) {
+						entryStrings[entryIndex] = this.Serialize(entry.Key);
+						entryStrings[entryIndex + 1] = this.Serialize(entry.Value);
+						entryIndex += 2;
 					}
-					output.Append('}');
-					return output.ToString();
+					return string.Concat(preamble, string.Concat(entryStrings), "}");
 				}
 			case IDynamicMetaObjectProvider:
 				throw new NotSupportedException(
 					"Serialization support for dynamic objects is limited to PhpSerializerNET.PhpDynamicObject and System.Dynamic.ExpandoObject in this version."
 				);
 			case IDictionary dictionary: {
+					string preamble;
 					if (input is IPhpObject phpObject) {
-						output.Append("O:");
-						output.Append(phpObject.GetClassName().Length);
-						output.Append(":\"");
-						output.Append(phpObject.GetClassName());
-						output.Append("\":");
-						output.Append(dictionary.Count);
-						output.Append(":{");
+						string className = phpObject.GetClassName();
+						preamble = $"O:{className.Length}:\"{className}\":{dictionary.Count}:{{";
 					} else {
 						var dictionaryType = dictionary.GetType();
 						if (dictionaryType.GenericTypeArguments.Length > 0) {
@@ -138,28 +120,31 @@ internal class PhpSerializer {
 								throw new Exception($"Can not serialize into associative array with key type {keyType.FullName}");
 							}
 						}
-
-						output.Append($"a:{dictionary.Count}:");
-						output.Append('{');
+						preamble = $"a:{dictionary.Count}:{{";
 					}
 
+					string[] entryStrings = new string[dictionary.Count * 2];
+					int entryIndex = 0;
 					foreach (DictionaryEntry entry in dictionary) {
-						output.Append($"{this.Serialize(entry.Key)}{this.Serialize(entry.Value)}");
+						entryStrings[entryIndex] = this.Serialize(entry.Key);
+						entryStrings[entryIndex + 1] = this.Serialize(entry.Value);
+						entryIndex += 2;
 					}
-					output.Append('}');
-					return output.ToString();
+					return string.Concat(preamble, string.Concat(entryStrings), "}");
 				}
-			case IList collection: {
-					output.Append($"a:{collection.Count}:");
-					output.Append('{');
-					for (int i = 0; i < collection.Count; i++) {
-						output.Append(this.Serialize(i));
-						output.Append(this.Serialize(collection[i]));
-					}
-					output.Append('}');
-					return output.ToString();
+			case IList collection:
+				string[] itemStrings = new string[collection.Count * 2];
+				for (int i = 0; i < itemStrings.Length; i += 2) {
+					itemStrings[i] = string.Concat("i:", (i / 2).ToString(CultureInfo.InvariantCulture), ";");
+					itemStrings[i + 1] = this.Serialize(collection[i / 2]);
 				}
+				return string.Concat(
+					$"a:{collection.Count}:{{",
+					string.Concat(itemStrings),
+					"}"
+				);
 			default: {
+					StringBuilder output = new StringBuilder();
 					var inputType = input.GetType();
 
 					if (typeof(IPhpObject).IsAssignableFrom(inputType) || inputType.GetCustomAttribute<PhpClass>() != null) {
@@ -190,7 +175,6 @@ internal class PhpSerializer {
 							}
 						}
 					}
-
 					output.Append($"a:{members.Count}:");
 					output.Append('{');
 					foreach (var member in members) {

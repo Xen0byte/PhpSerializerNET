@@ -23,7 +23,7 @@ public class PhpDynamicObject : DynamicObject, IPhpObject {
 		return this._dictionary[name];
 	}
 
-	public override IEnumerable<string> GetDynamicMemberNames() {
+	public override ICollection<string> GetDynamicMemberNames() {
 		return this._dictionary.Keys;
 	}
 
