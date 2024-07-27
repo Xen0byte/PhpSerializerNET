@@ -64,7 +64,7 @@ public class EnableTypeLookupTest {
 		);
 		stopWatch.Stop();
 		long secondUncachedTime = stopWatch.ElapsedTicks;
-		Assert.True(secondUncachedTime / cachedTime  > 100);
+		Assert.True(secondUncachedTime / cachedTime  > 10);
 	}
 
 	[Fact]

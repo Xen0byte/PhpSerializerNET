@@ -71,7 +71,7 @@ public static class TypeLookup {
 		}
 		if (cacheEnabled) {
 			lock (TypeLookupCache) {
-				TypeLookupCache.Add(typeName, result);
+				TypeLookupCache.TryAdd(typeName, result);
 			}
 		}
 		return result;
