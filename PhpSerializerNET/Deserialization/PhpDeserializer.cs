@@ -247,34 +247,33 @@ internal ref struct PhpDeserializer {
 
 	private object MakeClass(in PhpToken token) {
 		var typeName = this.GetString(token);
-		object constructedObject;
 		Type targetType = null;
 		if (typeName != "stdClass" && this._options.EnableTypeLookup) {
 			targetType = TypeLookup.FindTypeInAssymbly(typeName, this._options.TypeCache.HasFlag(TypeCacheFlag.ClassNames));
 		}
-		if (targetType != null && typeName != "stdClass") {
-			_currentToken--; // go back one because we're basically re-entering the object-token from the top.
-			// If we don't decrement the pointer, we'd start with the first child token instead of the object token.
-			constructedObject = this.DeserializeToken(targetType);
-		} else {
-			dynamic result;
+		if (targetType == null || typeName == "stdClass") {
 			if (_options.StdClass == StdClassOption.Dynamic) {
-				result = new PhpDynamicObject();
+				var result = new PhpDynamicObject(token.Length, typeName);
+				result.SetClassName(typeName);
+				for (int i = 0; i < token.Length; i++) {
+					result.TryAdd((string)this.DeserializeToken(), this.DeserializeToken());
+				}
+				return result;
 			} else if (this._options.StdClass == StdClassOption.Dictionary) {
-				result = new PhpObjectDictionary();
+				var result = new PhpObjectDictionary(token.Length, typeName);
+				result.SetClassName(typeName);
+				for (int i = 0; i < token.Length; i++) {
+					result.TryAdd((string)this.DeserializeToken(), this.DeserializeToken());
+				}
+				return result;
 			} else {
 				throw new DeserializationException("Encountered 'stdClass' and the behavior 'Throw' was specified in deserialization options.");
 			}
-			for (int i = 0; i < token.Length; i++) {
-				var key = this.DeserializeToken();
-				var value = this.DeserializeToken();
-				result.TryAdd(
-					(string)key,
-					value
-				);
-			}
-			constructedObject = result;
 		}
+		// go back one because we're basically re-entering the object-token from the top.
+		// If we don't decrement the pointer, we'd start with the first child token instead of the object token.
+		_currentToken--;
+		var constructedObject = this.DeserializeToken(targetType);
 		if (constructedObject is IPhpObject phpObject and not PhpDateTime) {
 			phpObject.SetClassName(typeName);
 		}

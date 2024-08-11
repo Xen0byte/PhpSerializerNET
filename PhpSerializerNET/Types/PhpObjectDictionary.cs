@@ -13,10 +13,13 @@ namespace PhpSerializerNET;
 /// </summary>
 public class PhpObjectDictionary : Dictionary<string, object>, IPhpObject {
 	private string _className;
+	public PhpObjectDictionary() { }
 
-	public string GetClassName() {
-		return this._className;
+	public PhpObjectDictionary(int capacity, string className) : base(capacity) {
+		this._className = className;
 	}
+
+	public string GetClassName() => this._className;
 
 	public void SetClassName(string className) {
 		this._className = className;
