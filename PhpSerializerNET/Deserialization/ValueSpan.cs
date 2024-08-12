@@ -13,15 +13,15 @@ internal readonly struct ValueSpan {
 	private static ValueSpan _empty = new ValueSpan(0,0);
 	internal readonly int Start;
 	internal readonly int Length;
-	public ValueSpan(int start, int length) {
+
+	internal ValueSpan(int start, int length) {
 		this.Start = start;
 		this.Length = length;
 	}
 
-	public static ValueSpan Empty => _empty;
+	internal static ValueSpan Empty => _empty;
 
-	public ReadOnlySpan<byte> GetSlice(ReadOnlySpan<byte> input) => input.Slice(this.Start, this.Length);
-
+	internal ReadOnlySpan<byte> GetSlice(ReadOnlySpan<byte> input) => input.Slice(this.Start, this.Length);
 
 	internal double GetDouble(ReadOnlySpan<byte> input) {
 		var value = input.Slice(Start, Length);

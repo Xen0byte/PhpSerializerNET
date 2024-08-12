@@ -25,12 +25,10 @@ public ref struct PhpTokenizer {
 		this._tokenPosition = 0;
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private void Advance() {
 		this._position++;
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private void Advance(int positons) {
 		this._position += positons;
 	}
@@ -38,10 +36,8 @@ public ref struct PhpTokenizer {
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private ValueSpan GetNumbers() {
 		int start = this._position;
-		while (this._input[this._position] != (byte)';') {
-			this._position++;
-		}
-		return new ValueSpan(start, this._position-start);
+		while (this._input[++this._position] != (byte)';') { }
+		return new ValueSpan(start, this._position - start);
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -50,9 +46,7 @@ public ref struct PhpTokenizer {
 			return _input[_position++] - 48;
 		}
 		int start = this._position;
-		while (this._input[this._position] != (byte)':') {
-			this._position++;
-		}
+		while (this._input[++this._position] != (byte)':') { }
 		return int.Parse(this._input.Slice(start, this._position - start), CultureInfo.InvariantCulture);
 	}
 
@@ -82,12 +76,6 @@ public ref struct PhpTokenizer {
 				this.GetObjectToken();
 				break;
 		};
-	}
-
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private void GetNullToken() {
-		this._tokens[this._tokenPosition++] = new PhpToken(PhpDataType.Null, _position - 1, ValueSpan.Empty);
-		this.Advance();
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]

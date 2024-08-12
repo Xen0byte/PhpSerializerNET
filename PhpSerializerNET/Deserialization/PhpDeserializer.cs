@@ -127,12 +127,7 @@ internal ref struct PhpDeserializer {
 			TypeCode.UInt32 => uint.Parse(token.Value.GetSlice(_input), CultureInfo.InvariantCulture),
 			TypeCode.UInt64 => ulong.Parse(token.Value.GetSlice(_input), CultureInfo.InvariantCulture),
 			TypeCode.SByte => sbyte.Parse(token.Value.GetSlice(_input), CultureInfo.InvariantCulture),
-			_ => this.DeserializeTokenFromSimpleType(
-				targetType,
-				token.Type,
-				this.GetString(token),
-				token.Position
-			),
+			_ => this.DeserializeTokenFromSimpleType(targetType, token.Type, this.GetString(token), token.Position),
 		};
 	}
 
@@ -143,7 +138,7 @@ internal ref struct PhpDeserializer {
 
 		string value = this.GetString(token);
 		if (value == "INF") {
-			value =  double.PositiveInfinity.ToString(CultureInfo.InvariantCulture);
+			value = double.PositiveInfinity.ToString(CultureInfo.InvariantCulture);
 		} else if (value == "-INF") {
 			value = double.NegativeInfinity.ToString(CultureInfo.InvariantCulture);
 		}
@@ -159,13 +154,12 @@ internal ref struct PhpDeserializer {
 			underlyingType = targetType.GenericTypeArguments[0];
 		}
 
-		if (underlyingType.IsIConvertible()) {
-			return ((IConvertible)token.Value.GetBool(_input)).ToType(underlyingType, CultureInfo.InvariantCulture);
-		} else {
+		if (!underlyingType.IsIConvertible()) {
 			throw new DeserializationException(
 				$"Can not assign value \"{this.GetString(token)}\" (at position {token.Position}) to target type of {targetType.Name}."
 			);
 		}
+		return ((IConvertible)token.Value.GetBool(_input)).ToType(underlyingType, CultureInfo.InvariantCulture);
 	}
 
 	private object DeserializeTokenFromSimpleType(
@@ -351,7 +345,7 @@ internal ref struct PhpDeserializer {
 						DeserializeToken(property.PropertyType)
 					);
 				} catch (Exception exception) {
-					var valueToken = _tokens[_currentToken-1];
+					var valueToken = _tokens[_currentToken - 1];
 					throw new DeserializationException(
 						$"Exception encountered while trying to assign '{this.GetString(valueToken)}' to {targetType.Name}.{property.Name}. See inner exception for details.",
 						exception
@@ -368,24 +362,24 @@ internal ref struct PhpDeserializer {
 		var elementType = targetType.GetElementType() ?? throw new InvalidOperationException("targetType.GetElementType() returned null");
 		Array result = Array.CreateInstance(elementType, token.Length);
 
-		var arrayIndex = 0;
-		for (int i = 0; i < token.Length; i++) {
-			_currentToken++;
-			result.SetValue(
-				elementType == typeof(object)
-					? DeserializeToken()
-					: DeserializeToken(elementType),
-				arrayIndex
-			);
-			arrayIndex++;
+		if (elementType == typeof(object)) {
+			for (int i = 0; i < token.Length; i++) {
+				_currentToken++;
+				result.SetValue(DeserializeToken(), i);
+			}
+		} else {
+			for (int i = 0; i < token.Length; i++) {
+				_currentToken++;
+				result.SetValue(DeserializeToken(elementType), i);
+			}
 		}
 		return result;
 	}
 
 	private object MakeList(Type targetType, in PhpToken token) {
-		for (int i = 0; i < token.Length * 2; i+=2) {
-			if (this._tokens[_currentToken+i].Type != PhpDataType.Integer) {
-				var badToken = this._tokens[_currentToken+i];
+		for (int i = 0; i < token.Length * 2; i += 2) {
+			if (this._tokens[_currentToken + i].Type != PhpDataType.Integer) {
+				var badToken = this._tokens[_currentToken + i];
 				throw new DeserializationException(
 					$"Can not deserialize array at position {token.Position} to list: " +
 					$"It has a non-integer key '{this.GetString(badToken)}' at element {i} (position {badToken.Position})."
@@ -396,24 +390,23 @@ internal ref struct PhpDeserializer {
 		if (targetType.IsArray) {
 			return MakeArray(targetType, token);
 		}
-		var result = (IList)Activator.CreateInstance(targetType, token.Length);
-		if (result == null) {
+		if (Activator.CreateInstance(targetType, token.Length) is not IList result) {
 			throw new NullReferenceException("Activator.CreateInstance(targetType) returned null");
 		}
-		Type itemType;
-		if (targetType.GenericTypeArguments.Length >= 1) {
-			itemType = targetType.GenericTypeArguments[0];
-		} else {
-			itemType = typeof(object);
-		}
+		Type itemType = targetType.GenericTypeArguments.Length >= 1
+			? targetType.GenericTypeArguments[0]
+			: typeof(object);
 
-		for (int i = 0; i < token.Length; i++) {
-			_currentToken++;
-			result.Add(
-				itemType == typeof(object)
-					? DeserializeToken()
-					: DeserializeToken(itemType)
-			);
+		if (itemType == typeof(object)) {
+			for (int i = 0; i < token.Length; i++) {
+				_currentToken++;
+				result.Add(DeserializeToken());
+			}
+		} else {
+			for (int i = 0; i < token.Length; i++) {
+				_currentToken++;
+				result.Add(DeserializeToken(itemType));
+			}
 		}
 		return result;
 	}
@@ -425,10 +418,7 @@ internal ref struct PhpDeserializer {
 		}
 		if (!targetType.GenericTypeArguments.Any()) {
 			for (int i = 0; i < token.Length; i++) {
-				result.Add(
-					DeserializeToken(),
-					DeserializeToken()
-				);
+				result.Add(DeserializeToken(), DeserializeToken());
 			}
 			return result;
 		}
@@ -455,12 +445,12 @@ internal ref struct PhpDeserializer {
 		long previousKey = -1;
 		bool isList = true;
 		bool consecutive = true;
-		for (int i = 0; i < token.Length*2; i+=2) {
-			if (this._tokens[_currentToken+i].Type != PhpDataType.Integer) {
+		for (int i = 0; i < token.Length * 2; i += 2) {
+			if (this._tokens[_currentToken + i].Type != PhpDataType.Integer) {
 				isList = false;
 				break;
 			} else {
-				var key = this._tokens[_currentToken+i].Value.GetLong(_input);
+				var key = this._tokens[_currentToken + i].Value.GetLong(_input);
 				if (i == 0 || key == previousKey + 1) {
 					previousKey = key;
 				} else {
@@ -471,10 +461,7 @@ internal ref struct PhpDeserializer {
 		if (!isList || (this._options.UseLists == ListOptions.Default && consecutive == false)) {
 			var result = new Dictionary<object, object>(token.Length);
 			for (int i = 0; i < token.Length; i++) {
-				result.Add(
-					this.DeserializeToken(),
-					this.DeserializeToken()
-				);
+				result.Add(this.DeserializeToken(), this.DeserializeToken());
 			}
 			return result;
 		} else {

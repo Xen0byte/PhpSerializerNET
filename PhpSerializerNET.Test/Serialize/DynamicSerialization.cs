@@ -29,7 +29,6 @@ public class DynamicSerializationTest {
 		data.SetClassName("phpDynamicObject");
 		data.Foo = "a";
 		data.Bar = 3.1415;
-		System.Console.WriteLine(data.Bar);
 		Assert.Equal(
 			"O:16:\"phpDynamicObject\":2:{s:3:\"Foo\";s:1:\"a\";s:3:\"Bar\";d:3.1415;}",
 			PhpSerialization.Serialize(data)

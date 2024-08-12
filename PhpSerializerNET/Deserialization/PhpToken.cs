@@ -13,8 +13,8 @@ internal readonly struct PhpToken {
 	internal readonly PhpDataType Type;
 	internal readonly int Position;
 	internal readonly int Length;
-
 	internal readonly ValueSpan Value;
+
 	internal PhpToken(PhpDataType type, int position, in ValueSpan value, int length = 0) {
 		this.Type = type;
 		this.Position = position;
