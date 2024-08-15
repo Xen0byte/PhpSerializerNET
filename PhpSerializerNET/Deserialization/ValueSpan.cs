@@ -10,7 +10,7 @@ using System.Globalization;
 using System.Text;
 
 internal readonly struct ValueSpan {
-	private static ValueSpan _empty = new ValueSpan(0,0);
+	private static ValueSpan _empty = new ValueSpan(0, 0);
 	internal readonly int Start;
 	internal readonly int Length;
 
@@ -26,19 +26,32 @@ internal readonly struct ValueSpan {
 	internal double GetDouble(ReadOnlySpan<byte> input) {
 		var value = input.Slice(Start, Length);
 		return value switch {
-			[(byte)'I', (byte)'N', (byte)'F'] => double.PositiveInfinity,
-			[(byte)'-', (byte)'I', (byte)'N', (byte)'F'] => double.NegativeInfinity,
-			[(byte)'N', (byte)'A', (byte)'N'] => double.NaN,
+		[(byte)'I', (byte)'N', (byte)'F'] => double.PositiveInfinity,
+		[(byte)'-', (byte)'I', (byte)'N', (byte)'F'] => double.NegativeInfinity,
+		[(byte)'N', (byte)'A', (byte)'N'] => double.NaN,
 			_ => double.Parse(value, CultureInfo.InvariantCulture),
 		};
 	}
 
 	internal bool GetBool(ReadOnlySpan<byte> input) => input[this.Start] == '1';
 
-	internal long GetLong(ReadOnlySpan<byte> input) => long.Parse(
-		input.Slice(this.Start, this.Length),
-		CultureInfo.InvariantCulture
-	);
+	internal long GetLong(ReadOnlySpan<byte> input) {
+		// All the PHP integers we deal with here can only be the number characters and an optional "-".
+		// See also the Validator code.
+		// 'long.Parse()' has to take into account that we can skip here, making this manual approach faster.
+		var span = input.Slice(this.Start, this.Length);
+		int i = 0;
+		bool isNegative = false;
+		if (span[0] == '-') {
+			i++;
+			isNegative = true;
+		}
+		long result = 0;
+		for (; i < span.Length; i++) {
+			result = result * 10 + (span[i] - 48);
+		}
+		return isNegative ? result * -1 : result;
+	}
 
 	internal string GetString(ReadOnlySpan<byte> input, Encoding inputEncoding) {
 		return inputEncoding.GetString(input.Slice(this.Start, this.Length));

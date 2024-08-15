@@ -15,8 +15,17 @@ public class IntegerDeserializationTest {
 	[InlineData("i:1;", 1)]
 	[InlineData("i:2147483647;", int.MaxValue)]
 	[InlineData("i:-2147483648;", int.MinValue)]
-	public void DeserializeZero(string input, int expected) {
+	public void Deserialize(string input, int expected) {
 		Assert.Equal(expected, PhpSerialization.Deserialize<int>(input));
+	}
+
+	[Theory]
+	[InlineData("i:0;", 0)]
+	[InlineData("i:1;", 1)]
+	[InlineData("i:2147483647;", int.MaxValue)]
+	[InlineData("i:-2147483648;", int.MinValue)]
+	public void DeserializeImplicit(string input, long expected) {
+		Assert.Equal(expected, PhpSerialization.Deserialize(input));
 	}
 
 	[Fact]

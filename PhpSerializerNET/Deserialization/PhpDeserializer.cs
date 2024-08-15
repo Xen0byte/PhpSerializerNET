@@ -9,13 +9,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace PhpSerializerNET;
 
 internal ref struct PhpDeserializer {
 	private readonly PhpDeserializationOptions _options;
-	private Encoding _inputEncoding;
 	private readonly Span<PhpToken> _tokens;
 	private readonly ReadOnlySpan<byte> _input;
 	private int _currentToken = 0;
@@ -24,7 +22,6 @@ internal ref struct PhpDeserializer {
 		_options = options;
 		_input = input;
 		_tokens = tokens;
-		_inputEncoding = _options.InputEncoding;
 	}
 
 	internal object Deserialize() {

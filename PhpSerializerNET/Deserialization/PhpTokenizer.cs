@@ -42,12 +42,11 @@ public ref struct PhpTokenizer {
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private int GetLength() {
-		if (this._input[this._position + 1] == ':') {
-			return _input[_position++] - 48;
+		int result = 0;
+		for (; this._input[this._position] != ':'; this._position++) {
+			result = result * 10 + (this._input[_position] - 48);
 		}
-		int start = this._position;
-		while (this._input[++this._position] != (byte)':') { }
-		return int.Parse(this._input.Slice(start, this._position - start), CultureInfo.InvariantCulture);
+		return result;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveOptimization)]
