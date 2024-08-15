@@ -12,7 +12,7 @@ namespace PhpSerializerNET;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
 public class PhpPropertyAttribute : Attribute {
 	public string Name { get; set; }
-	public long Key { get; set; }
+	public int Key { get; set; }
 	public bool IsInteger { get; private set; } = false;
 
 	/// <summary>
@@ -29,7 +29,7 @@ public class PhpPropertyAttribute : Attribute {
 	/// <remark>
 	/// Deserialization of objects and arrays with mixed keys may yield unexpected results and or exceptions on certain target types.
 	/// </remarks>
-	public PhpPropertyAttribute(long key) {
+	public PhpPropertyAttribute(int key) {
 		this.Key = key;
 		this.IsInteger = true;
 	}

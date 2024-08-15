@@ -21,8 +21,8 @@ namespace PhpSerializerNET.Test.Deserialize.Options {
 			var dictionary = test as Dictionary<object, object>;
 			Assert.NotNull(dictionary);
 			Assert.Equal(2, dictionary.Count);
-			Assert.Equal("a", dictionary[(long)0]);
-			Assert.Equal("b", dictionary[(long)1]);
+			Assert.Equal("a", dictionary[0]);
+			Assert.Equal("b", dictionary[1]);
 		}
 
 		[Fact]
@@ -55,8 +55,8 @@ namespace PhpSerializerNET.Test.Deserialize.Options {
 			var dictionary = result as Dictionary<object, object>;
 			Assert.NotNull(dictionary);
 			Assert.Equal(2, dictionary.Count);
-			Assert.Equal("a", dictionary[(long)2]);
-			Assert.Equal("b", dictionary[(long)4]);
+			Assert.Equal("a", dictionary[2]);
+			Assert.Equal("b", dictionary[4]);
 		}
 
 		[Fact]

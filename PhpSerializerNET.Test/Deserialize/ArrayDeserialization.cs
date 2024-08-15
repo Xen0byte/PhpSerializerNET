@@ -58,7 +58,7 @@ public class DeserializeArraysTest {
 		Assert.Equal(5, result.Count);
 
 		Assert.Equal("this is a string value", result["AString"]);
-		Assert.Equal((long)10, result["AnInteger"]);
+		Assert.Equal(10, result["AnInteger"]);
 		Assert.Equal(1.2345, result["ADouble"]);
 		Assert.Equal(true, result["True"]);
 		Assert.Equal(false, result["False"]);
@@ -110,9 +110,9 @@ public class DeserializeArraysTest {
 		Assert.Equal(5, result.Count);
 		// the cast to long on the keys is because of the hashtable and C# intrinsics.
 		// (int)0 and (long)0 aren't identical enough for the hashtable
-		Assert.Equal("this is a string value", result[(long)0]);
-		Assert.Equal((long)10, result[(long)1]);
-		Assert.Equal(1.2345, result[(long)2]);
+		Assert.Equal("this is a string value", result[(int)0]);
+		Assert.Equal(10, result[1]);
+		Assert.Equal(1.2345, result[2]);
 		Assert.Equal(true, result["True"]);
 		Assert.Equal(false, result["False"]);
 	}
@@ -197,7 +197,7 @@ public class DeserializeArraysTest {
 		Assert.Equal(5, dictionary.Count);
 
 		Assert.Equal("this is a string value", dictionary["AString"]);
-		Assert.Equal((long)10, dictionary["AnInteger"]);
+		Assert.Equal(10, dictionary["AnInteger"]);
 		Assert.Equal(1.2345, dictionary["ADouble"]);
 		Assert.Equal(true, dictionary["True"]);
 		Assert.Equal(false, dictionary["False"]);

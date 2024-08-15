@@ -35,7 +35,7 @@ internal readonly struct ValueSpan {
 
 	internal bool GetBool(ReadOnlySpan<byte> input) => input[this.Start] == '1';
 
-	internal long GetLong(ReadOnlySpan<byte> input) {
+	internal int GetInt(ReadOnlySpan<byte> input) {
 		// All the PHP integers we deal with here can only be the number characters and an optional "-".
 		// See also the Validator code.
 		// 'long.Parse()' has to take into account that we can skip here, making this manual approach faster.
@@ -46,7 +46,7 @@ internal readonly struct ValueSpan {
 			i++;
 			isNegative = true;
 		}
-		long result = 0;
+		int result = 0;
 		for (; i < span.Length; i++) {
 			result = result * 10 + (span[i] - 48);
 		}

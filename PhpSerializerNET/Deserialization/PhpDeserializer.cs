@@ -43,7 +43,7 @@ internal ref struct PhpDeserializer {
 			case PhpDataType.Boolean:
 				return token.Value.GetBool(this._input);
 			case PhpDataType.Integer:
-				return token.Value.GetLong(this._input);
+				return token.Value.GetInt(this._input);
 			case PhpDataType.Floating:
 				return token.Value.GetDouble(this._input);
 			case PhpDataType.String:
@@ -318,7 +318,7 @@ internal ref struct PhpDeserializer {
 					? this.GetString(nameToken)
 					: this.GetString(nameToken).ToLower();
 			} else if (nameToken.Type == PhpDataType.Integer) {
-				propertyName = nameToken.Value.GetLong(_input);
+				propertyName = nameToken.Value.GetInt(_input);
 			} else {
 				throw new DeserializationException(
 					$"Error encountered deserizalizing an object of type '{targetType.FullName}': " +
@@ -447,7 +447,7 @@ internal ref struct PhpDeserializer {
 				isList = false;
 				break;
 			} else {
-				var key = this._tokens[_currentToken + i].Value.GetLong(_input);
+				int key = this._tokens[_currentToken + i].Value.GetInt(_input);
 				if (i == 0 || key == previousKey + 1) {
 					previousKey = key;
 				} else {

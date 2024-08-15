@@ -3,6 +3,10 @@
 ## Breaking
 - `PhpTokenizer` class is now internal.
 - Removed support for `net6.0` and `net7.0`.
+- The default implicit type for numeric values is now `int` instead of `long`
+  1.x: `PhpSerialization.Deserialize("i:42;") == 42L` 
+  2.x: `PhpSerialization.Deserialize("i:42;") == 42` 
+- Changed the signature of `[PhpPropery(long)]` to `[PhpPropery(long)]` to align with the above change.
 
 ## Features
 - Added `PhpSerialization.DeserializeUtf8(ReadOnlySpan<byte>)` overloads for cases in which consumers directly work with
