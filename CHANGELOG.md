@@ -11,6 +11,8 @@
 ## Features
 - Added `PhpSerialization.DeserializeUtf8(ReadOnlySpan<byte>)` overloads for cases in which consumers directly work with
   UTF8 inputs and can skip the re-encoding.
+- Added `PhpSerializationFilter` attribute base class, allowing customization of class and struct member serialization.
+  See the `PhpSerializationFilterTest` for an example. See also [Issue #33](https://github.com/StringEpsilon/PhpSerializerNET/issues/33).
 
 ## Regular changes
 - Integers and doubles without a value now give a better error message (`i:;` and `d:;`).
