@@ -38,19 +38,21 @@ internal readonly struct ValueSpan {
 	internal int GetInt(ReadOnlySpan<byte> input) {
 		// All the PHP integers we deal with here can only be the number characters and an optional "-".
 		// See also the Validator code.
-		// 'long.Parse()' has to take into account that we can skip here, making this manual approach faster.
+		// 'long.Parse()' has to make considerations that we can skip here, making this manual approach faster.
 		var span = input.Slice(this.Start, this.Length);
-		int i = 0;
-		bool isNegative = false;
-		if (span[0] == '-') {
-			i++;
-			isNegative = true;
+		if (span[0] == (byte)'-') {
+			int result = span[1] - 48;
+			for (int i = 2; i < span.Length; i++) {
+				result = result * 10 + (span[i] - 48);
+			}
+			return result*-1;
+		} else {
+			int result = span[0] - 48;
+			for (int i = 1; i < span.Length; i++) {
+				result = result * 10 + (span[i] - 48);
+			}
+			return result;
 		}
-		int result = 0;
-		for (; i < span.Length; i++) {
-			result = result * 10 + (span[i] - 48);
-		}
-		return isNegative ? result * -1 : result;
 	}
 
 	internal string GetString(ReadOnlySpan<byte> input, Encoding inputEncoding) {
