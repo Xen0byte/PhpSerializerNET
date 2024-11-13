@@ -11,7 +11,7 @@ namespace PhpSerializerNET.Test.DataTypes {
 			return this._className;
 		}
 		public void SetClassName(string className) {
-			_className = className;
+			this._className = className;
 		}
 		public string Foo { get; set; }
 	}

@@ -13,11 +13,11 @@ public class PhpDynamicObject : DynamicObject, IPhpObject {
 	private readonly PhpObjectDictionary _dictionary;
 
 	public PhpDynamicObject() {
-		_dictionary = new();
+		this._dictionary = new();
 	}
 
 	public PhpDynamicObject(int capacity, string className) {
-		_dictionary = new(capacity, className);
+		this._dictionary = new(capacity, className);
 	}
 
 	public void SetClassName(string className) => this._dictionary.SetClassName(className);

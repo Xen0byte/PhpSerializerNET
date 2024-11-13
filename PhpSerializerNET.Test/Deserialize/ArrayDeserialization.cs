@@ -40,7 +40,7 @@ public class DeserializeArraysTest {
 
 	[Fact]
 	public void ExplicitToClassWrongProperty() {
-		var ex = Assert.Throws<PhpSerializerNET.DeserializationException>(() =>
+		var ex = Assert.Throws<DeserializationException>(() =>
 			PhpSerialization.Deserialize<SimpleClass>(
 				"a:1:{s:7:\"BString\";s:22:\"this is a string value\";}"
 			)
@@ -148,7 +148,7 @@ public class DeserializeArraysTest {
 
 	[Fact]
 	public void ExplicitToStructWrongField() {
-		var ex = Assert.Throws<PhpSerializerNET.DeserializationException>(() =>
+		var ex = Assert.Throws<DeserializationException>(() =>
 			PhpSerialization.Deserialize<AStruct>(
 				"a:1:{s:7:\"BString\";s:22:\"this is a string value\";}"
 			)
@@ -173,7 +173,7 @@ public class DeserializeArraysTest {
 
 	[Fact]
 	public void ExplicitToListNonIntegerKey() {
-		var ex = Assert.Throws<PhpSerializerNET.DeserializationException>(() =>
+		var ex = Assert.Throws<DeserializationException>(() =>
 			PhpSerialization.Deserialize<List<string>>("a:3:{i:0;s:5:\"Hello\";s:1:\"a\";s:5:\"World\";i:2;i:12345;}")
 		);
 

@@ -4,6 +4,7 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 **/
 
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -14,7 +15,7 @@ internal static class ArrayExtensions {
 		var result = new Dictionary<object, PropertyInfo>(properties.Length);
 		foreach (var property in properties) {
 			var isIgnored = false;
-			var attributes = PhpPropertyAttribute.GetCustomAttributes(property, false);
+			var attributes = Attribute.GetCustomAttributes(property, false);
 			PhpPropertyAttribute phpPropertyAttribute = null;
 			foreach (var attribute in attributes) {
 				if (attribute is PhpIgnoreAttribute) {
@@ -47,7 +48,7 @@ internal static class ArrayExtensions {
 		var result = new Dictionary<string, FieldInfo>(fields.Length);
 		foreach (var field in fields) {
 			var isIgnored = false;
-			var attributes = PhpPropertyAttribute.GetCustomAttributes(field, false);
+			var attributes = Attribute.GetCustomAttributes(field, false);
 			PhpPropertyAttribute phpPropertyAttribute = null;
 			foreach (var attribute in attributes) {
 				if (attribute is PhpIgnoreAttribute) {

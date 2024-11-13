@@ -36,7 +36,8 @@ internal ref struct PhpTokenValidator {
 				break;
 			case (byte)'s':
 				this.GetCharacter(':');
-				int length = this.GetLength(PhpDataType.String);
+				int length = 0;
+				this.GetLength(PhpDataType.String, ref length);
 				this.GetCharacter(':');
 				this.GetCharacter('"');
 				this.GetNCharacters(length);
@@ -146,18 +147,15 @@ internal ref struct PhpTokenValidator {
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private int GetLength(PhpDataType dataType) {
-		int length = 0;
-
+	private void GetLength(PhpDataType dataType, ref int length) {
 		for (; this._input[this._position] != ':' && this._position < this._lastIndex; this._position++) {
 			length = this._input[this._position] switch {
-				>= (byte)'0' and <= (byte)'9' => length * 10 + (_input[_position] - 48),
+				>= (byte)'0' and <= (byte)'9' => length * 10 + (this._input[this._position] - 48),
 				_ => throw new DeserializationException(
 					$"{dataType} at position {this._position} has illegal, missing or malformed length."
 				),
 			};
 		}
-		return length;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -188,15 +186,17 @@ internal ref struct PhpTokenValidator {
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private void GetObjectToken() {
-		int position = _position - 1;
+		int position = this._position - 1;
+		int classNamelength = 0;
+		int propertyCount = 0;
 		this.GetCharacter(':');
-		int classNamelength = this.GetLength(PhpDataType.Object);
+		this.GetLength(PhpDataType.Object, ref classNamelength);
 		this.GetCharacter(':');
 		this.GetCharacter('"');
 		this.GetNCharacters(classNamelength);
 		this.GetCharacter('"');
 		this.GetCharacter(':');
-		int propertyCount = this.GetLength(PhpDataType.Object);
+		this.GetLength(PhpDataType.Object, ref propertyCount);
 		this.GetCharacter(':');
 		this.GetCharacter('{');
 		int i = 0;
@@ -217,9 +217,10 @@ internal ref struct PhpTokenValidator {
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private void GetArrayToken() {
-		int position = _position - 1;
+		int position = this._position - 1;
 		this.GetCharacter(':');
-		int length = this.GetLength(PhpDataType.Array);
+		int length = 0;
+		this.GetLength(PhpDataType.Array, ref length);
 		this.GetCharacter(':');
 		this.GetCharacter('{');
 		int i = 0;

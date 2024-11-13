@@ -41,15 +41,14 @@ internal class PhpSerializer {
 
 			case double floatValue:
 				if (double.IsPositiveInfinity(floatValue)) {
-					return $"d:INF;";
+					return "d:INF;";
 				}
 				if (double.IsNegativeInfinity(floatValue)) {
-					return $"d:-INF;";
+					return "d:-INF;";
 				}
-				if (double.IsNaN(floatValue)) {
-					return $"d:NAN;";
-				}
-				return string.Concat("d:", floatValue.ToString(CultureInfo.InvariantCulture), ";");
+				return double.IsNaN(floatValue)
+					? "d:NAN;"
+					: string.Concat("d:", floatValue.ToString(CultureInfo.InvariantCulture), ";");
 
 			case string stringValue:
 				// Use the UTF8 byte count, because that's what the PHP implementation does:
@@ -232,7 +231,7 @@ internal class PhpSerializer {
 			.Append(":\"")
 			.Append(className)
 			.Append("\":")
-			.Append(properties.Count)
+			.Append(memberCount)
 			.Append(":{")
 			.Append(members)
 			.Append('}');
