@@ -1,6 +1,7 @@
 # Future
 
 ## Breaking
+- Now targets .NET 8.0 and .NET 9.0
 - `PhpTokenizer` class is now internal.
 - Removed support for `net6.0` and `net7.0`.
 - The default implicit type for numeric values is now `int` instead of `long`
