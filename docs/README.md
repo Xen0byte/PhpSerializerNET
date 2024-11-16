@@ -14,6 +14,7 @@ You can make some decisions about de/serialization directly on your class and st
 * [PhpClass](./Attributes/PhpClass.md)
 * [PhpIgnore](./Attributes/PhpIgnore.md)
 * [PhpProperty](./Attributes/PhpProperty.md)
+* [PhpSerializationFilter](./Attributes/PhpSerializationFilter.md)
 
 ### Options
 
