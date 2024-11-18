@@ -7,6 +7,7 @@
   [GH #40](https://github.com/StringEpsilon/PhpSerializerNET/issues/40)
 - Related to the above: Some nested arrays or arrays with object values would never implicetly deserialize into a        
   `List<object>` because the check if the array keys are consecutive integers was faulty.
+- Do not throw when a property or field is decorated with it's own name such as `[PhpProperty["A"]] public int A;`.
 
 # 2.0.0 (2024-11-13)
 
