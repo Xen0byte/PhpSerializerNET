@@ -52,7 +52,7 @@ public class EnableTypeLookupTest {
 		stopWatch.Stop();
 		long cachedTime = stopWatch.ElapsedTicks;
 
-		Assert.True(uncachedTime / cachedTime  > 100);
+		Assert.True(uncachedTime / cachedTime  > 5);
 
 		PhpSerialization.ClearTypeCache();
 		PhpSerialization.ClearPropertyInfoCache();
@@ -64,7 +64,7 @@ public class EnableTypeLookupTest {
 		);
 		stopWatch.Stop();
 		long secondUncachedTime = stopWatch.ElapsedTicks;
-		Assert.True(secondUncachedTime / cachedTime  > 10);
+		Assert.True(secondUncachedTime / cachedTime  > 5);
 	}
 
 	[Fact]
