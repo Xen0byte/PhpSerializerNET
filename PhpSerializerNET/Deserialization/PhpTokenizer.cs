@@ -121,24 +121,27 @@ public ref struct PhpTokenizer {
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private void GetArrayToken() {
+		var tokenPosition = this._tokenPosition++;
 		int position = this._position - 1;
 		this._position++;
 		int length = this.GetLength();
-		this._tokens[this._tokenPosition++] = new PhpToken(
-			PhpDataType.Array,
-			position,
-			ValueSpan.Empty,
-			length
-		);
 		this.Advance(2);
 		for (int i = 0; i < length * 2; i++) {
 			this.GetToken();
 		}
+		this._tokens[tokenPosition] = new PhpToken(
+			PhpDataType.Array,
+			position,
+			ValueSpan.Empty,
+			length,
+			lastValuePosition: this._tokenPosition -1
+		);
 		this._position++;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private void GetObjectToken() {
+		var tokenPosition = this._tokenPosition++;
 		int position = this._position - 1;
 		this._position++;
 		int classNameLength = this.GetLength();
@@ -146,16 +149,17 @@ public ref struct PhpTokenizer {
 		ValueSpan classNameSpan = new ValueSpan(this._position, classNameLength);
 		this.Advance(2 + classNameLength);
 		int propertyCount = this.GetLength();
-		this._tokens[this._tokenPosition++] = new PhpToken(
-			PhpDataType.Object,
-			position,
-			classNameSpan,
-			propertyCount
-		);
 		this.Advance(2);
 		for (int i = 0; i < propertyCount * 2; i++) {
 			this.GetToken();
 		}
+		this._tokens[tokenPosition] = new PhpToken(
+			PhpDataType.Object,
+			position,
+			classNameSpan,
+			propertyCount,
+			lastValuePosition: this._tokenPosition -1
+		);
 		this._position++;
 	}
 

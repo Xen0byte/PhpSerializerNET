@@ -1,4 +1,14 @@
-# Future
+# 2.0.1 (2024-11-18)
+
+## Bugfixes
+- Fixed validation error when deserializing a list of objects. The deserializer would check the wrong token for it's 
+  datatype and throw and exception like this:
+  `Can not deserialize array at position [x] to list: It has a non-integer key 'name' at element [y]` 
+  [GH #40](https://github.com/StringEpsilon/PhpSerializerNET/issues/40)
+- Related to the above: Some nested arrays or arrays with object values would never implicetly deserialize into a        
+  `List<object>` because the check if the array keys are consecutive integers was faulty.
+
+# 2.0.0 (2024-11-13)
 
 ## Breaking
 - Now targets .NET 8.0 and .NET 9.0

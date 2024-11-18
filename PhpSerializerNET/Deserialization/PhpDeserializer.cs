@@ -395,13 +395,22 @@ internal ref struct PhpDeserializer {
 	}
 
 	private object MakeList(Type targetType, in PhpToken token) {
-		for (int i = 0; i < token.Length * 2; i += 2) {
-			if (this._tokens[this._currentToken + i].Type != PhpDataType.Integer) {
-				var badToken = this._tokens[this._currentToken + i];
+		int index = 0;
+		int itemPosition = this._currentToken;
+		while (index < token.Length) {
+			var valueToken = this._tokens[itemPosition +1];
+			if (this._tokens[itemPosition].Type != PhpDataType.Integer) {
+				var keyToken = this._tokens[itemPosition];
 				throw new DeserializationException(
 					$"Can not deserialize array at position {token.Position} to list: " +
-					$"It has a non-integer key '{this.GetString(badToken)}' at element {i} (position {badToken.Position})."
+					$"It has a non-integer key '{this.GetString(keyToken)}' at element {index+1} (position {keyToken.Position})."
 				);
+			}
+			index++;
+			if (valueToken.Type == PhpDataType.Array || valueToken.Type == PhpDataType.Object) {
+				itemPosition = valueToken.ValueEnd +1;
+			} else {
+				itemPosition += 2;
 			}
 		}
 
@@ -468,17 +477,25 @@ internal ref struct PhpDeserializer {
 		long previousKey = -1;
 		bool isList = true;
 		bool consecutive = true;
-		for (int i = 0; i < token.Length * 2; i += 2) {
-			if (this._tokens[this._currentToken + i].Type != PhpDataType.Integer) {
+		int index = 0;
+		int itemPosition = this._currentToken;
+		while (index < token.Length) {
+			if (this._tokens[itemPosition].Type != PhpDataType.Integer) {
 				isList = false;
 				break;
 			} else {
-				int key = this._tokens[this._currentToken + i].Value.GetInt(this._input);
-				if (i == 0 || key == previousKey + 1) {
+				int key = this._tokens[itemPosition].Value.GetInt(this._input);
+				if (index == 0 || key == previousKey + 1) {
 					previousKey = key;
 				} else {
 					consecutive = false;
 				}
+			}
+			index++;
+			if (this._tokens[itemPosition+1].Type == PhpDataType.Array || this._tokens[itemPosition+1].Type == PhpDataType.Object) {
+				itemPosition = this._tokens[itemPosition+1].ValueEnd +1;
+			} else {
+				itemPosition += 2;
 			}
 		}
 

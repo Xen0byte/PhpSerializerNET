@@ -239,4 +239,25 @@ public class DeserializeArraysTest {
 		Assert.Equal("A", result.Baz);
 		Assert.Equal("B", result.Dummy);
 	}
+
+	public class ArrayItem
+	{
+		[PhpProperty("foo")] public string Foo { get; set; }
+		[PhpProperty("bar")] public InnerArrayItem Bar { get; set; }
+	}
+
+	public class InnerArrayItem
+	{
+		public string A { get; set; }
+		public string B { get; set; }
+	}
+
+	[Fact]
+	public void NestedArrays() {
+		// Regression test for https://github.com/StringEpsilon/PhpSerializerNET/issues/40
+		var value = """a:2:{i:0;a:2:{s:3:"foo";s:4:"ixcg";s:3:"bar";a:2:{s:1:"A";s:5:"04381";s:1:"B";s:5:"11576";}}i:1;a:2:{s:3:"foo";s:4:"atnp";s:3:"bar";a:2:{s:1:"A";s:5:"33267";s:1:"B";s:5:"68391";}}}""";
+    	// PropertyType is
+		var item = PhpSerialization.Deserialize<List<ArrayItem>>(value);
+		Assert.NotNull(item);
+	}
 }
