@@ -26,6 +26,9 @@ internal static class ArrayExtensions {
 					phpPropertyAttribute = foundAttribute;
 				}
 			}
+			var propertyName = options.CaseSensitiveProperties
+					? property.Name
+					: property.Name.ToLower();
 			if (phpPropertyAttribute != null) {
 				if (phpPropertyAttribute.IsInteger) {
 					result.Add(phpPropertyAttribute.Key, isIgnored ? null : property);
@@ -33,12 +36,11 @@ internal static class ArrayExtensions {
 					var attributeName = options.CaseSensitiveProperties
 						? phpPropertyAttribute.Name
 						: phpPropertyAttribute.Name.ToLower();
-					result.Add(attributeName, isIgnored ? null : property);
+					if (attributeName != propertyName) {
+						result.Add(attributeName, isIgnored ? null : property);
+					}
 				}
 			}
-			var propertyName = options.CaseSensitiveProperties
-					? property.Name
-					: property.Name.ToLower();
 			result.Add(propertyName, isIgnored ? null : property);
 		}
 		return result;
@@ -59,16 +61,17 @@ internal static class ArrayExtensions {
 					phpPropertyAttribute = foundAttribute;
 				}
 			}
+			var fieldName = options.CaseSensitiveProperties
+					? field.Name
+					: field.Name.ToLower();
 			if (phpPropertyAttribute != null) {
 				var attributeName = options.CaseSensitiveProperties
 					? phpPropertyAttribute.Name
 					: phpPropertyAttribute.Name.ToLower();
-				result.Add(attributeName, isIgnored ? null : field);
+				if (attributeName != fieldName) {
+					result.Add(attributeName, isIgnored ? null : field);
+				}
 			}
-
-			var fieldName = options.CaseSensitiveProperties
-					? field.Name
-					: field.Name.ToLower();
 			result.Add(fieldName, isIgnored ? null : field);
 		}
 		return result;

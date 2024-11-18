@@ -131,6 +131,15 @@ public class DeserializeArraysTest {
 	}
 
 	[Fact]
+	public void RedundantMappingInfo() {
+		var deserializedObject = PhpSerialization.Deserialize<BadMappedClass>(
+			"""a:2:{s:1:"A";i:1;s:1:"B";i:2;}"""
+		);
+		Assert.Equal(1, deserializedObject.A);
+		Assert.Equal(2, deserializedObject.B);
+	}
+
+	[Fact]
 	public void ExplicitToStruct() {
 		var value = PhpSerialization.Deserialize<AStruct>(
 			"a:2:{s:3:\"foo\";s:3:\"Foo\";s:3:\"bar\";s:3:\"Bar\";}"

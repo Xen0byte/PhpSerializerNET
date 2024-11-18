@@ -46,6 +46,13 @@ public class DeserializeStructsTest {
 		Assert.Equal("Foo", value.foo);
 		Assert.Equal("Bar", value.bar);
 	}
+	[Fact]
+	public void DeserializeDuplicateFieldName() {
+		var value = PhpSerialization.Deserialize<RedundantStructName>(
+			"a:1:{s:3:\"foo\";s:3:\"Foo\";}"
+		);
+		Assert.Equal("Foo", value.foo);
+	}
 
 	[Fact]
 	public void DeserializeBoolToStruct() {

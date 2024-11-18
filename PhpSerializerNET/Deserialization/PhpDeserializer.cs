@@ -360,7 +360,7 @@ internal ref struct PhpDeserializer {
 						result, this.DeserializeToken(property.PropertyType)
 					);
 				} catch (Exception exception) {
-					var valueToken = this._tokens[this._currentToken - 1];
+					var valueToken = this._tokens[this._currentToken-1];
 					throw new DeserializationException(
 						$"Exception encountered while trying to assign '{this.GetString(valueToken)}' to {targetType.Name}.{property.Name}. See inner exception for details.",
 						exception
@@ -408,7 +408,7 @@ internal ref struct PhpDeserializer {
 			}
 			index++;
 			if (valueToken.Type == PhpDataType.Array || valueToken.Type == PhpDataType.Object) {
-				itemPosition = valueToken.ValueEnd +1;
+				itemPosition = valueToken.LastValuePosition +1;
 			} else {
 				itemPosition += 2;
 			}
@@ -493,7 +493,7 @@ internal ref struct PhpDeserializer {
 			}
 			index++;
 			if (this._tokens[itemPosition+1].Type == PhpDataType.Array || this._tokens[itemPosition+1].Type == PhpDataType.Object) {
-				itemPosition = this._tokens[itemPosition+1].ValueEnd +1;
+				itemPosition = this._tokens[itemPosition+1].LastValuePosition +1;
 			} else {
 				itemPosition += 2;
 			}

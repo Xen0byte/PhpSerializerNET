@@ -20,4 +20,12 @@ namespace PhpSerializerNET.Test.DataTypes {
 
 		public Guid Guid { get; set; }
 	}
+
+	public class BadMappedClass {
+		[PhpProperty("A")]
+		public int A { get; set; }
+
+		[PhpProperty("B")]
+		public int B { get; set; }
+	}
 }

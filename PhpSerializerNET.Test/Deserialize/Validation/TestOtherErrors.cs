@@ -39,19 +39,27 @@ public class TestOtherErrors {
 		);
 
 		const string expected = "PhpSerialization.Deserialize(): Parameter 'input' must not be null or empty. (Parameter 'input')";
+		const string expectedUtf8 = "PhpSerialization.DeserializeUtf8(): Parameter 'input' must not be empty. (Parameter 'input')";
 		Assert.Equal(expected, ex.Message);
 
 		ex = Assert.Throws<ArgumentOutOfRangeException>(
 			() => PhpSerialization.Deserialize<string>("")
 		);
-
 		Assert.Equal(expected, ex.Message);
 
 		ex = Assert.Throws<ArgumentOutOfRangeException>(
 			() => PhpSerialization.Deserialize("", typeof(string))
 		);
-
 		Assert.Equal(expected, ex.Message);
+
+		ex = Assert.Throws<ArgumentOutOfRangeException>(
+			() => PhpSerialization.DeserializeUtf8(""u8, typeof(string))
+		);
+		Assert.Equal(expectedUtf8, ex.Message);
+		ex = Assert.Throws<ArgumentOutOfRangeException>(
+			() => PhpSerialization.DeserializeUtf8(""u8)
+		);
+		Assert.Equal(expectedUtf8, ex.Message);
 	}
 
 

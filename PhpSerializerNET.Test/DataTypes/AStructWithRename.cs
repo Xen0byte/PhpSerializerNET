@@ -11,4 +11,8 @@ namespace PhpSerializerNET.Test.DataTypes {
 		[PhpProperty("foobar")]
 		public string bar;
 	}
+	public struct RedundantStructName {
+		[PhpProperty("foo")]
+		public string foo;
+	}
 }
