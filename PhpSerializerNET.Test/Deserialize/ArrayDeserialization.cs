@@ -179,6 +179,12 @@ public class DeserializeArraysTest {
 
 		Assert.Equal(new string[] { "Hello", "World", "12345" }, result);
 	}
+	[Fact]
+	public void ExplicitToObjectArray() {
+		var result = PhpSerialization.Deserialize<object[]>("a:3:{i:0;s:5:\"Hello\";i:1;s:5:\"World\";i:2;i:12345;}");
+
+		Assert.Equal(new object[] { "Hello", "World", 12345 }, result);
+	}
 
 	[Fact]
 	public void ExplicitToListNonIntegerKey() {

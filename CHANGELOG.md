@@ -1,3 +1,7 @@
+# 2.0.2 (Future)
+- Fixed a bug where integers with a plus sign where deserialized incorrectly
+  `i:+1;` was deserialized as `49`.
+
 # 2.0.1 (2024-11-18)
 
 ## Bugfixes

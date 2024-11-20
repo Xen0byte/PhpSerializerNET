@@ -5,6 +5,7 @@
 **/
 
 namespace PhpSerializerNET.Test.DataTypes {
+	[PhpClass("MyPhpObject")]
 	public struct IPhpObjectStruct : IPhpObject {
 		private string _className;
 		public string GetClassName() {

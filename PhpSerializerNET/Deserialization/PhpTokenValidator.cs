@@ -25,7 +25,7 @@ internal ref struct PhpTokenValidator {
 	}
 
 	internal void GetToken() {
-		switch ( this._input[this._position++]) {
+		switch (this._input[this._position++]) {
 			case (byte)'b':
 				this.GetCharacter(':');
 				this.GetBoolean();
@@ -102,11 +102,11 @@ internal ref struct PhpTokenValidator {
 				),
 			};
 		}
-			if (i == this._position) {
-				throw new DeserializationException(
-					$"Unexpected token at index {i}: Expected floating point number, but found ';' instead."
-				);
-			}
+		if (i == this._position) {
+			throw new DeserializationException(
+				$"Unexpected token at index {i}: Expected floating point number, but found ';' instead."
+			);
+		}
 		this._position = i;
 
 		// Edgecase: input ends here without a delimeter following. Normal handling would give a misleading exception:

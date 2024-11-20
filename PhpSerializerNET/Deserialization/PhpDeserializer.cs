@@ -33,10 +33,6 @@ internal ref struct PhpDeserializer {
 		return this.DeserializeToken(targetType);
 	}
 
-	internal T Deserialize<T>() {
-		return (T)this.Deserialize(typeof(T));
-	}
-
 	private object DeserializeToken() {
 		var token = this._tokens[this._currentToken];
 		this._currentToken++;
@@ -209,7 +205,7 @@ internal ref struct PhpDeserializer {
 			}
 
 			if (targetType == typeof(bool)) {
-				if (this._options.NumberStringToBool && value is "0" or "1") {
+				if (this._options.NumberStringToBool && (value == "0" || value == "1")) {
 					return value == "1";
 				}
 			}

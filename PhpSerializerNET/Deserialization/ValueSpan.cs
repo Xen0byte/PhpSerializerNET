@@ -44,6 +44,12 @@ internal readonly struct ValueSpan {
 				result = result * 10 + (span[i] - 48);
 			}
 			return result*-1;
+		} else if (span[0] == (byte)'+') {
+			int result = span[1] - 48;
+			for (int i = 2; i < span.Length; i++) {
+				result = result * 10 + (span[i] - 48);
+			}
+			return result;
 		} else {
 			int result = span[0] - 48;
 			for (int i = 1; i < span.Length; i++) {

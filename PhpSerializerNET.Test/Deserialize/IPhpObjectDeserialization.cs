@@ -22,7 +22,7 @@ public class IPhpObjectDeserializationTest {
 	[Fact]
 	public void DeerializesPhpObjectDictionary() {
 		var result = PhpSerialization.Deserialize<PhpObjectDictionary>("O:11:\"MyPhpObject\":1:{s:3:\"Foo\";s:0:\"\";}");
-		Assert.Equal( // strings:
+		Assert.Equal(
 			"MyPhpObject",
 			result.GetClassName()
 		);
@@ -31,7 +31,15 @@ public class IPhpObjectDeserializationTest {
 	[Fact]
 	public void DeerializesIPhpObjectStruct() {
 		var result = PhpSerialization.Deserialize<IPhpObjectStruct>("O:11:\"MyPhpObject\":1:{s:3:\"Foo\";s:0:\"\";}");
-		Assert.Equal( // strings:
+		Assert.Equal(
+			"MyPhpObject",
+			result.GetClassName()
+		);
+	}
+	[Fact]
+	public void DeserializesIPhpObjectStruct_Implicit() {
+		var result = PhpSerialization.Deserialize("O:11:\"MyPhpObject\":1:{s:3:\"Foo\";s:0:\"\";}") as IPhpObject;
+		Assert.Equal(
 			"MyPhpObject",
 			result.GetClassName()
 		);

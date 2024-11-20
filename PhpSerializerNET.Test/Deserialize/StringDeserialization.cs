@@ -49,6 +49,17 @@ public class StringDeserializationTest {
 				EmptyStringToDefault = true
 			})
 		);
+		Assert.Null(
+			PhpSerialization.Deserialize<object>("s:0:\"\";", new PhpDeserializationOptions {
+				EmptyStringToDefault = true
+			})
+		);
+		Assert.Equal(
+			"",
+			PhpSerialization.Deserialize<object>("s:0:\"\";", new PhpDeserializationOptions {
+				EmptyStringToDefault = false
+			})
+		);
 		Assert.Equal(
 			"string",
 			PhpSerialization.Deserialize<string>("s:6:\"string\";", new PhpDeserializationOptions {
