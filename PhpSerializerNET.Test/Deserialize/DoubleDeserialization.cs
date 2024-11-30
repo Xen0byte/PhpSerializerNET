@@ -6,6 +6,7 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 **/
 
+using System.Globalization;
 using PhpSerializerNET.Test.Deserialize.Options;
 using Xunit;
 
@@ -33,6 +34,20 @@ public class DoubleDeserializationTest {
 		Assert.Equal(
 			expected,
 			PhpSerialization.Deserialize(input)
+		);
+	}
+
+	[Theory]
+	[InlineData("d:1;", "1")]
+	[InlineData("d:-1;", "-1")]
+	[InlineData("d:1.23456789;", "1.23456789")]
+	[InlineData("d:-1.23456789;", "-1.23456789")]
+	[InlineData("d:INF;", "Infinity")]
+	[InlineData("d:-INF;", "-Infinity")]
+	public void DeserializesDoubleToStrings(string input, string expected) {
+		Assert.Equal(
+			expected,
+			PhpSerialization.Deserialize<string>(input)
 		);
 	}
 
